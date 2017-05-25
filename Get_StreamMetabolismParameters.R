@@ -1,6 +1,10 @@
-setwd('P:/Projects/GitHub_Prj/DO_Data')
+setwd('/Users/tbecker/Documents/GitHub/DO_Data')
 
 library(streamMetabolizer)
+gage<- read.table("gage_dates.txt",header=TRUE,stringsAsFactors=FALSE)
+gage<-na.omit(gage)
+gage$Site<-paste("0",gage$Site,sep="")
+gage$DischargeGage<-paste("0",gage$DischargeGage,sep="")
 
 
 ######assume one header line and tab delimited structure, with # as a comment out to skip#####
@@ -28,14 +32,16 @@ parse_fstat<-function(fstat_lines,skip='#',delim='\t'){
 #    00300     Dissolved oxygen, water, unfiltered, milligrams per liter
 #    00301     Dissolved oxygen, water, unfiltered, percent of saturation
 
+for (i in 1:dim(gage)[1]){
 
 base_url    <-'https://waterservices.usgs.gov/nwis';
-site        <-'01195510'
-flowsite    <-'01195490'
-start_date  <-'2015-06-30';
-end_date    <-'2015-09-22';
+site        <- gage$Site[i];
+flowsite    <- gage$DischargeGage[i];
+start_date  <- gage$startDT[i];
+end_date    <- gage$endDT[i];
 parameterCd <-'00010,00095,00300,00301';
 FparameterCd<-'00060,00065';
+sampleYR    <- gage$sampleYR[i]
 
 ###Combine into url for site#########
 parts <- c(base_url,'/iv/?format=rdb',
@@ -86,5 +92,6 @@ for (i in 3:length(colnames(DO))){
 ##convert gage height to meters##
 DO$depth<- DO$depth*0.3048
 
-write.csv(DO,paste("data/DO_",site,".csv",sep=""),row.names=FALSE)
+write.csv(DO,paste("data/",site,sampleYR,".csv",sep=""),row.names=FALSE)
 
+}
