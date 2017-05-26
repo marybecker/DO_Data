@@ -1,4 +1,4 @@
-setwd('P:/Projects/GitHub_Prj/DO_Data')
+setwd('')
 
 library(streamMetabolizer)
 gage<- read.table("gage_dates.txt",header=TRUE,stringsAsFactors=FALSE)
