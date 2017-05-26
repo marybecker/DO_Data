@@ -1,8 +1,8 @@
-setwd('/Users/tbecker/Documents/GitHub/DO_Data')
+setwd('P:/Projects/GitHub_Prj/DO_Data')
 
 library(streamMetabolizer)
 gage<- read.table("gage_dates.txt",header=TRUE,stringsAsFactors=FALSE)
-gage<-na.omit(gage)
+gage<- gage[which(gage$DischargeGage!="NA"),]
 gage$Site<-paste("0",gage$Site,sep="")
 gage$DischargeGage<-paste("0",gage$DischargeGage,sep="")
 
@@ -32,7 +32,8 @@ parse_fstat<-function(fstat_lines,skip='#',delim='\t'){
 #    00300     Dissolved oxygen, water, unfiltered, milligrams per liter
 #    00301     Dissolved oxygen, water, unfiltered, percent of saturation
 
-for (i in 1:dim(gage)[1]){
+n<- dim(gage)[1]
+for (i in 1:n){
 
 base_url    <-'https://waterservices.usgs.gov/nwis';
 site        <- gage$Site[i];
@@ -83,6 +84,8 @@ for (i in 5:length(colnames(DO))){
 DO$datetimePOS<- as.POSIXct(DO$datetime,format="%Y-%m-%d %H:%M", tz='America/New_York')
 DO$solar.time<- calc_solar_time(DO$datetimePOS,longitude=-106.3)
 DO<- DO[,c("site_no","solar.time","temp.water","discharge","depth","cond","DO.obs","DO.sat")]
+DO<- DO[!is.na(DO$DO.obs),]
+DO<- DO[(DO$DO.obs!=""),]
 
 ##convert data to numerics#######
 for (i in 3:length(colnames(DO))){
@@ -92,6 +95,6 @@ for (i in 3:length(colnames(DO))){
 ##convert gage height to meters##
 DO$depth<- DO$depth*0.3048
 
-write.csv(DO,paste("data/",site,sampleYR,".csv",sep=""),row.names=FALSE)
+write.csv(DO,paste("data/",site,"_",sampleYR,".csv",sep=""),row.names=FALSE)
 
 }
