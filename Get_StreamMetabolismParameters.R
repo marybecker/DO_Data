@@ -1,6 +1,9 @@
 setwd('')
 
 library(streamMetabolizer)
+
+#Load table of gages with start and end dates and alternate discharge gage stations 
+#if not the same as continuous DO site######
 gage<- read.table("gage_dates.txt",header=TRUE,stringsAsFactors=FALSE)
 gage<- gage[which(gage$DischargeGage!="NA"),]
 gage$Site<-paste("0",gage$Site,sep="")
@@ -83,7 +86,7 @@ for (i in 5:length(colnames(DO))){
 
 DO$datetimePOS<- as.POSIXct(DO$datetime,format="%Y-%m-%d %H:%M", tz='America/New_York')
 DO$solar.time<- calc_solar_time(DO$datetimePOS,longitude=-106.3)
-DO<- DO[,c("site_no","solar.time","temp.water","discharge","depth","cond","DO.obs","DO.sat")]
+DO<- DO[,c("site_no","solar.time","temp.water","discharge","depth","cond","DO.obs")]
 DO<- DO[!is.na(DO$DO.obs),]
 DO<- DO[(DO$DO.obs!=""),]
 
